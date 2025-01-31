@@ -400,7 +400,7 @@
 
             // Eslatma yuborish funksiyasi
             async function sendReminder(lesson) {
-                const reminderText = `⏰ Diqqat! 15 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
+                const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
 
                 try {
                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -424,7 +424,7 @@
 
                 const date = new Date();
                 date.setDate(parseInt(day));
-                date.setHours(hours, minutes - 15, 0, 0); // 15 daqiqa oldin
+                date.setHours(hours, minutes - 5, 0, 0); // 5 daqiqa oldin
 
                 return date.getTime();
             }
