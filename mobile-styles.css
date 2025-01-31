@@ -1,3 +1,24 @@
+/* Admin stil */
+.admin-container button {
+    background: var(--secondary);
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.admin-container button:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        margin: 20px;
+        padding: 10px;
+    }
+}
 /* mobile-styles.css */
 @media (max-width: 428px) {
     .day-column {
