@@ -1,0 +1,12 @@
+/* mobile-styles.css */
+@media (max-width: 428px) {
+    .day-column {
+        width: 95%;
+        margin: 10px auto;
+    }
+
+    .random-theme-btn {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
