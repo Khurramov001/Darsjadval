@@ -6,20 +6,20 @@ function cleanupOldRatings() {
     for (const subject in lessonRatings) {
         for (const userId in lessonRatings[subject]) {
             const ratingTime = lessonRatings[subject][userId].timestamp;
-            if (currentTime - ratingTime > 10 * 60 * 60 * 1000) { // 10 soat = 10 * 60 * 60 * 1000 millisekund
+            if (currentTime - ratingTime > 10 * 60 * 60 * 1000) { // 10 soat
                 delete lessonRatings[subject][userId];
             }
         }
     }
 }
 
-// Foydalanuvchi qaysi darsga baho berayotganini aniqlash
+// Joriy darsni aniqlash
 function getCurrentLesson() {
     const now = new Date();
-    const currentDay = now.toLocaleDateString('uz-UZ', { weekday: 'long' }); // Joriy kunni olish
-    const currentTime = now.toTimeString().slice(0, 5); // Joriy vaqtni "HH:MM" formatida olish
+    const currentDay = now.toLocaleDateString('uz-UZ', { weekday: 'long' });
+    const currentTime = now.toTimeString().slice(0, 5);
 
-    const lessons = fullSchedule[currentDay];
+    const lessons = window.fullSchedule[currentDay];
     if (!lessons) return null;
 
     for (const lesson of lessons) {
@@ -38,17 +38,17 @@ function rateLesson(subject, userId, rating) {
     }
 
     if (lessonRatings[subject][userId]) {
-        console.log("Siz allaqachon baholagansiz!");
+        alert("Siz allaqachon baholagansiz!");
         return;
     }
 
     if (rating < 1 || rating > 5) {
-        console.log("Baholash 1 dan 5 gacha bo'lishi kerak.");
+        alert("Baholash 1 dan 5 gacha bo'lishi kerak.");
         return;
     }
 
     lessonRatings[subject][userId] = { rating, timestamp: Date.now() };
-    console.log(`"${subject}" darsi ${rating} ball bilan baholandi.`);
+    alert(`"${subject}" darsi ${rating} ball bilan baholandi.`);
 }
 
 // O'rtacha bahoni hisoblash
@@ -67,36 +67,46 @@ function calculateAverageRating(subject) {
 }
 
 // Yulduzchalar interfeysi
-const stars = document.querySelectorAll('.stars span');
-const averageRatingElement = document.getElementById('averageRating');
+document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('.stars span');
+    const averageRatingElement = document.getElementById('ratingValue');
+    const lessonTitleElement = document.getElementById('title');
+    const lessonTimeElement = document.getElementById('time');
 
-stars.forEach(star => {
-    star.addEventListener('click', () => {
-        const rating = parseInt(star.getAttribute('data-rating'));
-        const currentLesson = getCurrentLesson(); // Joriy darsni aniqlash
-        const userId = Telegram.WebApp.initDataUnsafe.user?.id;
+    const currentLesson = getCurrentLesson();
+    if (!currentLesson) {
+        alert("Hozir hech qanday dars bo'lmaganligi sababli baho berish mumkin emas!");
+        window.location.href = "index.html"; // Bosh sahifaga qaytish
+        return;
+    }
 
-        if (!userId) {
-            alert("Iltimos, avval botga kirish amalga oshiring!");
-            return;
-        }
+    lessonTitleElement.textContent = currentLesson.subject;
+    lessonTimeElement.textContent = currentLesson.time;
 
-        if (!currentLesson) {
-            alert("Hozir hech qanday dars bo'lmaganligi sababli baho berish mumkin emas!");
-            return;
-        }
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            const userId = Telegram.WebApp.initDataUnsafe.user?.id;
 
-        rateLesson(currentLesson.subject, userId, rating);
-
-        stars.forEach((s, index) => {
-            if (index < rating) {
-                s.classList.add('active');
-            } else {
-                s.classList.remove('active');
+            if (!userId) {
+                alert("Iltimos, avval botga kirish amalga oshiring!");
+                return;
             }
-        });
 
-        const averageRating = calculateAverageRating(currentLesson.subject);
-        averageRatingElement.textContent = averageRating;
+            rateLesson(currentLesson.subject, userId, rating);
+
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.add('active');
+                    s.classList.remove('inactive');
+                } else {
+                    s.classList.add('inactive');
+                    s.classList.remove('active');
+                }
+            });
+
+            const averageRating = calculateAverageRating(currentLesson.subject);
+            averageRatingElement.textContent = averageRating;
+        });
     });
 });
