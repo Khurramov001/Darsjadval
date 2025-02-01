@@ -1,8 +1,24 @@
 const BOT_TOKEN = '7291198987:AAFJiJ1nxyO0MXjw4dMUjGGeIjul_EX1exk';
 let USER_CHAT_ID = null;
 
+function sendRatingReminder(lesson) {
+    const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars tugaydi:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}\nIltimos, darsni baholang!`;
+
+    try {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: USER_CHAT_ID,
+                text: reminderText
+            })
+        });
+    } catch (error) {
+        console.error('Xatolik:', error);
+    }
+}
 async function sendReminder(lesson) {
-    const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
+   const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
 
     try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
