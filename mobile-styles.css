@@ -31,3 +31,24 @@
         padding: 8px 16px;
     }
 }
+/* Baholash uchun stil */
+.stars span {
+    font-size: 24px; /* Yulduzchalarning o'lchami */
+    cursor: pointer; /* Sichqoncha ustiga kelganda ko'rsatkich o'zgaradi */
+    color: #ccc; /* Aktiv bo'lmagan yulduzchalarning rangi */
+    transition: color 0.3s ease; /* Rang o'zgarishi animatsiyasi */
+}
+
+.stars span.active {
+    color: gold; /* Aktiv yulduzchalarning rangi */
+}
+
+#ratingSection {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#averageRating {
+    font-weight: bold;
+    color: var(--accent);
+}
