@@ -161,6 +161,18 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <!-- Baholash uchun qism -->
+    <div id="ratingSection">
+        <h3>Darsni baholang:</h3>
+        <div class="stars">
+            <span data-rating="1">&#9733;</span> <!-- 1-yulduz -->
+            <span data-rating="2">&#9733;</span> <!-- 2-yulduz -->
+            <span data-rating="3">&#9733;</span> <!-- 3-yulduz -->
+            <span data-rating="4">&#9733;</span> <!-- 4-yulduz -->
+            <span data-rating="5">&#9733;</span> <!-- 5-yulduz -->
+        </div>
+        <p>O'rtacha baho: <span id="averageRating">0</span></p>
+    </div>
     <button id="notificationBtn" class="random-theme-btn" style="top: 80px;">
         🔔 Eslatmalarni Yoqish
     </button>
@@ -394,6 +406,75 @@
         }
 
         createSchedule();
+        // Baholash tizimi
+        const lessonRatings = {}; // Baholarni saqlash uchun obyekt
+
+        function rateLesson(subject, userId, rating) {
+            if (!lessonRatings[subject]) {
+                lessonRatings[subject] = {}; // Agar dars uchun baholar mavjud bo'lmasa, yangi obyekt yaratamiz
+            }
+
+            // Foydalanuvchi allaqachon baholaganmi?
+            if (lessonRatings[subject][userId]) {
+                console.log("Siz allaqachon baholagansiz!");
+                return;
+            }
+
+            // Baholash 1 dan 5 gacha bo'lishi kerak
+            if (rating < 1 || rating > 5) {
+                console.log("Baholash 1 dan 5 gacha bo'lishi kerak.");
+                return;
+            }
+
+            // Baholashni saqlash
+            lessonRatings[subject][userId] = rating;
+            console.log(`"${subject}" darsi ${rating} ball bilan baholandi.`);
+        }
+
+        function calculateAverageRating(subject) {
+            if (!lessonRatings[subject] || Object.keys(lessonRatings[subject]).length === 0) {
+                return 0; // Baholar mavjud emas
+            }
+
+            const ratings = Object.values(lessonRatings[subject]); // Barcha baholarni olish
+            const total = ratings.reduce((sum, rating) => sum + rating, 0); // Baholarni yig'indisi
+            const average = total / ratings.length; // O'rtacha baho
+
+            return average.toFixed(2); // O'rtacha baho 2 xona aniqlikda
+        }
+
+        // Yulduzchalarni faollashtirish
+        const stars = document.querySelectorAll('.stars span');
+        const averageRatingElement = document.getElementById('averageRating');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.getAttribute('data-rating')); // Tanlangan baho
+                const subject = "Geometriya"; // Misol uchun "Geometriya" darsi
+                const userId = Telegram.WebApp.initDataUnsafe.user?.id; // Foydalanuvchi ID
+
+                if (!userId) {
+                    alert("Iltimos, avval botga kirish amalga oshiring!");
+                    return;
+                }
+
+                // Baholashni saqlash
+                rateLesson(subject, userId, rating);
+
+                // Yulduzchalarni faollashtirish
+                stars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.classList.add('active'); // Tanlangan yulduzchalarni sariq qilamiz
+                    } else {
+                        s.classList.remove('active'); // Qolganlarini kulrang qilamiz
+                    }
+                });
+
+                // O'rtacha bahoni yangilash
+                const averageRating = calculateAverageRating(subject);
+                averageRatingElement.textContent = averageRating;
+            });
+        });
          const BOT_TOKEN = '7291198987:AAFJiJ1nxyO0MXjw4dMUjGGeIjul_EX1exk'; // BotFather tokenini qo'ying!
             let USER_CHAT_ID = null;
 
