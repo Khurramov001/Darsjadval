@@ -170,7 +170,6 @@
 </div>
     <div class="schedule-grid" id="schedule"></div>
     <button class="random-theme-btn" id="randomThemeBtn">Random Theme</button>
-    <div class="schedule-grid" id="schedule"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -417,17 +416,28 @@
             }
 
             // Vaqtni hisoblash funksiyasi
-            function calculateReminderTime(dayString, timeString) {
-                const [_, day] = dayString.split(' '); // "Dushanba 27" -> 27
-                const [startTime] = timeString.split('-');
-                const [hours, minutes] = startTime.split(':');
+                function calculateReminderTime(dayName, timeString) {
+                    const daysMap = {
+                        "Dushanba": 1,
+                        "Chorshanba": 2,
+                        "Payshanba": 3,
+                        "Shanba": 6
+                    };
 
-                const date = new Date();
-                date.setDate(parseInt(day));
-                date.setHours(hours, minutes - 5, 0, 0); // 5 daqiqa oldin
+                    const [start] = timeString.split('-');
+                    const [hours, minutes] = start.split(':');
 
-                return date.getTime();
-            }
+                    const date = new Date();
+                    const targetDay = daysMap[dayName];
+                    const currentDay = date.getDay();
+
+                    // Keyingi hafta kuniga o'tish
+                    const diff = (targetDay + 7 - currentDay) % 7;
+                    date.setDate(date.getDate() + diff);
+
+                    date.setHours(hours, minutes - 5, 0, 0); // 5 daqiqa oldin
+                    return date.getTime();
+                }
 
             // Eslatmalarni sozlash
             function setupReminders() {
@@ -441,16 +451,63 @@
                 });
             }
 
-            // Tugma bosilganda ishga tushirish
-            document.getElementById('notificationBtn').addEventListener('click', () => {
-                USER_CHAT_ID = Telegram.WebApp.initDataUnsafe.user?.id;
-                if(USER_CHAT_ID) {
-                    setupReminders();
-                    Telegram.WebApp.showAlert('🔔 Eslatmalar yoqildi!');
-                } else {
-                    Telegram.WebApp.showAlert('⚠️ Iltimos, avval botga kirish amalga oshiring!');
+        // Yangi qo'shilgan funksiyalar
+        async function sendCompletionMessage() {
+            const completionText = "Darslarni tugatdingiz! Zo‘r! Endi ozgina dam oling, balki biror shirinlik bilan o‘zingizni siylarsiz? 🍫☕";
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: USER_CHAT_ID,
+                        text: completionText
+                    })
+                });
+            } catch (error) {
+                console.error('Xatolik:', error);
+            }
+        }
+
+        function setupCompletionMessage() {
+            const daysOrder = ["Dushanba", "Chorshanba", "Payshanba", "Shanba"];
+            let lastLessonTime = 0;
+
+            daysOrder.forEach(day => {
+                const lessons = fullSchedule[day];
+                if(!lessons) return;
+
+                const lastLesson = lessons[lessons.length - 1];
+                const [_, end] = lastLesson.time.split('-');
+                const [hours, minutes] = end.split(':');
+
+                const lessonDate = new Date();
+                // Kunni hafta kuniga moslashtirish
+                const dayIndex = daysOrder.indexOf(day);
+                const currentDay = lessonDate.getDay(); // 0-Yakshanba, 1-Dushanba...
+                lessonDate.setDate(lessonDate.getDate() + ((dayIndex + 1) - currentDay));
+
+                lessonDate.setHours(hours, minutes, 0, 0);
+
+                if(lessonDate.getTime() > lastLessonTime) {
+                    lastLessonTime = lessonDate.getTime();
                 }
             });
+
+            if(lastLessonTime > Date.now()) {
+                setTimeout(sendCompletionMessage, lastLessonTime - Date.now());
+            }
+        }
+
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+            USER_CHAT_ID = Telegram.WebApp.initDataUnsafe.user?.id;
+            if(USER_CHAT_ID) {
+                setupReminders();
+                setupCompletionMessage();
+                Telegram.WebApp.showAlert('🔔 Barcha eslatmalar faollashtirildi!');
+            } else {
+                Telegram.WebApp.showAlert('⚠️ Botga kirishni tekshiring!');
+            }
+        });
         </script>
 </body>
 </html>
