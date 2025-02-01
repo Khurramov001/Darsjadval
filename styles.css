@@ -272,3 +272,12 @@ body {
         grid-template-columns: 1fr; /* Kichik ekranlarda bir ustun */
     }
 }
+.btn.active {
+    background-color: #3498db; /* Rangli holat */
+    color: white;
+}
+
+.btn.inactive {
+    background-color: #e0e0e0; /* Rangsiz holat */
+    color: #333;
+}
