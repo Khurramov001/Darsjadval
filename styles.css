@@ -1,0 +1,274 @@
+:root {
+    --primary: #2c3e50;
+    --secondary: #e74c3c;
+    --accent: #3498db;
+    --background: #1a1a1a;
+    --text-color: #ecf0f1;
+}
+
+body {
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    background: var(--background);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    text-align: center;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.day-column {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.day-column:hover {
+    background: rgba(46, 204, 113, 0.1);
+    box-shadow: 0 15px 40px rgba(46, 204, 113, 0.2);
+}
+
+.time-slot {
+    padding: 10px;
+    margin: 8px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-slot::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: var(--secondary);
+    border-radius: 5px;
+}
+
+.lesson-title {
+    color: var(--accent);
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+.lesson-details {
+    font-size: 0.8em;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.day-header {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: var(--primary);
+    border-radius: 10px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+/* Umumiy stil */
+body {
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    background: var(--background);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    width: 100%;
+}
+
+.day-column {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.time-slot {
+    padding: 10px;
+    margin: 8px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-slot::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: var(--secondary);
+    border-radius: 5px;
+}
+
+.lesson-title {
+    color: var(--accent);
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+.lesson-details {
+    font-size: 0.8em;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.day-header {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: var(--primary);
+    border-radius: 10px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+/* Kichik ekranlar uchun moslashuvchan stil */
+@media (max-width: 768px) {
+    .schedule-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .day-column {
+        padding: 10px;
+    }
+
+    .lesson-title {
+        font-size: 0.85em;
+    }
+
+    .lesson-details {
+        font-size: 0.75em;
+    }
+
+    .btn {
+        font-size: 0.9em;
+        padding: 8px 16px;
+    }
+
+    .container {
+        padding: 5px;
+    }
+}
+
+/* Juda kichik ekranlar (masalan, iPhone SE) uchun stil */
+@media (max-width: 480px) {
+    .schedule-grid {
+        grid-template-columns: 1fr; /* Bir ustunli ko'rinish */
+    }
+
+    .day-column {
+        padding: 8px;
+    }
+
+    .lesson-title {
+        font-size: 0.8em;
+    }
+
+    .lesson-details {
+        font-size: 0.7em;
+    }
+
+    .btn {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+
+    .container {
+        padding: 2px;
+    }
+}
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+@media (max-width: 480px) {
+    .schedule-grid {
+        grid-template-columns: 1fr; /* Kichik ekranlarda bir ustun */
+    }
+}
