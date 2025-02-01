@@ -1,78 +1,64 @@
 const BOT_TOKEN = '7291198987:AAFJiJ1nxyO0MXjw4dMUjGGeIjul_EX1exk';
 let USER_CHAT_ID = null;
 
-function sendRatingReminder(lesson) {
-    const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars tugaydi:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}\nIltimos, darsni baholang!`;
+// Tugma holatini localStorage dan olish
+let remindersEnabled = localStorage.getItem('remindersEnabled') === 'true';
 
-    try {
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                chat_id: USER_CHAT_ID,
-                text: reminderText
-            })
-        });
-    } catch (error) {
-        console.error('Xatolik:', error);
-    }
-}
-async function sendReminder(lesson) {
-   const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
-
-    try {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                chat_id: USER_CHAT_ID,
-                text: reminderText
-            })
-        });
-    } catch (error) {
-        console.error('Xatolik:', error);
+// Tugma holatini yangilash
+function updateButtonState() {
+    const notificationBtn = document.getElementById('notificationBtn');
+    if (remindersEnabled) {
+        notificationBtn.classList.add('active');
+        notificationBtn.classList.remove('inactive');
+        notificationBtn.textContent = '🔔 Eslatmalar Yoqilgan';
+    } else {
+        notificationBtn.classList.add('inactive');
+        notificationBtn.classList.remove('active');
+        notificationBtn.textContent = '🔔 Eslatmalarni Yoqish';
     }
 }
 
-function calculateReminderTime(dayName, timeString) {
-    const daysMap = {
-        "Dushanba": 1,
-        "Chorshanba": 2,
-        "Payshanba": 3,
-        "Shanba": 6
-    };
+// Eslatmalarni yoqish/o'chirish
+function toggleReminders() {
+    remindersEnabled = !remindersEnabled;
+    localStorage.setItem('remindersEnabled', remindersEnabled);
 
-    const [start] = timeString.split('-');
-    const [hours, minutes] = start.split(':');
-
-    const date = new Date();
-    const targetDay = daysMap[dayName];
-    const currentDay = date.getDay();
-
-    const diff = (targetDay + 7 - currentDay) % 7;
-    date.setDate(date.getDate() + diff);
-
-    date.setHours(hours, minutes - 5, 0, 0);
-    return date.getTime();
-}
-
-function setupReminders() {
-    Object.entries(fullSchedule).forEach(([day, lessons]) => {
-        lessons.forEach(lesson => {
-            const reminderTime = calculateReminderTime(day, lesson.time);
-            if(reminderTime > Date.now()) {
-                setTimeout(() => sendReminder(lesson), reminderTime - Date.now());
-            }
-        });
-    });
-}
-
-document.getElementById('notificationBtn').addEventListener('click', () => {
-    USER_CHAT_ID = Telegram.WebApp.initDataUnsafe.user?.id;
-    if(USER_CHAT_ID) {
+    if (remindersEnabled) {
         setupReminders();
         Telegram.WebApp.showAlert('🔔 Barcha eslatmalar faollashtirildi!');
+    } else {
+        Telegram.WebApp.showAlert('🔕 Barcha eslatmalar o\'chirildi!');
+    }
+
+    updateButtonState();
+}
+
+// Sahifa yuklanganda tugma holatini yangilash
+document.addEventListener('DOMContentLoaded', () => {
+    updateButtonState();
+});
+
+// Tugma bosilganda eslatmalarni yoqish/o'chirish
+document.getElementById('notificationBtn').addEventListener('click', () => {
+    USER_CHAT_ID = Telegram.WebApp.initDataUnsafe.user?.id;
+    if (USER_CHAT_ID) {
+        toggleReminders();
     } else {
         Telegram.WebApp.showAlert('⚠️ Botga kirishni tekshiring!');
     }
 });
+
+// Eslatmalarni sozlash (oldingi kod)
+function setupReminders() {
+    Object.entries(fullSchedule).forEach(([day, lessons]) => {
+        lessons.forEach(lesson => {
+            const reminderTime = calculateReminderTime(day, lesson.time);
+            if (reminderTime && reminderTime > Date.now()) {
+                setTimeout(() => {
+                    const reminderText = `⏰ Diqqat! 5 daqiqadan keyin dars:\n📚 ${lesson.subject}\n🕒 ${lesson.time}\n🎓 ${lesson.instructor}`;
+                    sendMessage(USER_CHAT_ID, reminderText);
+                }, reminderTime - Date.now());
+            }
+        });
+    });
+}
