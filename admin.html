@@ -2,137 +2,35 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="mobile-styles.css">
-    <style>
-        .admin-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-        }
-
-        .admin-form {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        input, textarea {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--accent);
-            background: rgba(0,0,0,0.3);
-            color: var(--text-color);
-        }
-
-        .lesson-list {
-            margin-top: 20px;
-        }
-
-        .lesson-item {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="admin-container">
-        <h2>📊 Admin Panel</h2>
+    <div class="container">
+        <h1>Admin Paneli</h1>
         
-        <!-- Yangi dars qo'shish formasi -->
-        <form class="admin-form" id="addLessonForm">
-            <input type="text" name="day" placeholder="Hafta kuni (masalan, Dushanba 27)" required>
-            <input type="time" name="startTime" required>
-            <input type="time" name="endTime" required>
-            <input type="text" name="subject" placeholder="Fan nomi" required>
-            <input type="text" name="instructor" placeholder="O'qituvchi" required>
-            <select name="type">
-                <option value="Ma'ruza">Ma'ruza</option>
-                <option value="Amaliy">Amaliy</option>
-            </select>
-            <button type="submit">➕ Dars qo'shish</button>
-        </form>
+        <!-- Foydalanuvchilar soni -->
+        <div class="section">
+            <h2>Foydalanuvchilar Soni</h2>
+            <p id="userCount">Yuklanmoqda...</p>
+        </div>
 
-        <!-- Mavjud darslar ro'yxati -->
-        <div class="lesson-list" id="lessonList"></div>
+        <!-- Xabar yuborish -->
+        <div class="section">
+            <h2>Xabar Yuborish</h2>
+            <textarea id="messageInput" placeholder="Xabar matnini kiriting"></textarea>
+            <button id="sendMessageBtn">Xabarni Yuborish</button>
+        </div>
+
+        <!-- Dars jadvalini yangilash -->
+        <div class="section">
+            <h2>Dars Jadvalini Yangilash</h2>
+            <textarea id="scheduleInput" placeholder="Dars jadvalini kiriting (JSON formatida)"></textarea>
+            <button id="updateScheduleBtn">Jadvalni Yangilash</button>
+        </div>
     </div>
 
-    <script>
-        // Adminlar ro'yxati (ID larni o'zgartiring)
-        const ADMINS = [1731948177]; 
-
-        // Foydalanuvchini tekshirish
-        const tg = window.Telegram.WebApp;
-        const user = tg.initDataUnsafe.user;
-        
-        if(!ADMINS.includes(user?.id)) {
-            document.body.innerHTML = `<h2 style="text-align:center;color:var(--secondary)">⚠️ Ruxsat yo'q!</h2>`;
-            throw new Error("Not authorized");
-        }
-
-        // Darslarni yuklash
-        let fullSchedule = JSON.parse(localStorage.getItem('schedule')) || {};
-
-        // Formani ishlovchi
-        document.getElementById('addLessonForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            
-            const newLesson = {
-                time: `${formData.get('startTime')}-${formData.get('endTime')}`,
-                subject: formData.get('subject'),
-                instructor: formData.get('instructor'),
-                type: formData.get('type'),
-                group: "2-12 Fizika-matematika"
-            };
-
-            const dayKey = formData.get('day');
-            if(!fullSchedule[dayKey]) fullSchedule[dayKey] = [];
-            fullSchedule[dayKey].push(newLesson);
-            
-            localStorage.setItem('schedule', JSON.stringify(fullSchedule));
-            renderLessons();
-            e.target.reset();
-        });
-
-        // Darslarni ko'rsatish
-        function renderLessons() {
-            const container = document.getElementById('lessonList');
-            container.innerHTML = '';
-            
-            Object.entries(fullSchedule).forEach(([day, lessons]) => {
-                const dayBlock = document.createElement('div');
-                dayBlock.innerHTML = `<h3>${day}</h3>`;
-                
-                lessons.forEach((lesson, index) => {
-                    const lessonDiv = document.createElement('div');
-                    lessonDiv.className = 'lesson-item';
-                    lessonDiv.innerHTML = `
-                        <p>🕒 ${lesson.time}</p>
-                        <p>📚 ${lesson.subject}</p>
-                        <p>🎓 ${lesson.instructor}</p>
-                        <button onclick="deleteLesson('${day}', ${index})">❌ O'chirish</button>
-                    `;
-                    dayBlock.appendChild(lessonDiv);
-                });
-                
-                container.appendChild(dayBlock);
-            });
-        }
-
-        // Darsni o'chirish
-        window.deleteLesson = (day, index) => {
-            fullSchedule[day].splice(index, 1);
-            localStorage.setItem('schedule', JSON.stringify(fullSchedule));
-            renderLessons();
-        }
-
-        // Dastlabki render
-        renderLessons();
-    </script>
+    <script src="admin.js"></script>
 </body>
 </html>
